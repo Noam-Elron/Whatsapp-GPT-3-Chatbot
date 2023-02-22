@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 from twilio.twiml.messaging_response import MessagingResponse
 from openai_init import generate_prompt, generate_image
-from database import user_check, create_user
+from database import ret_db_objects, user_check, create_user
 
 app = Flask(__name__)
 
@@ -22,13 +22,10 @@ def main():
     msg = resp.message()
     responded = False
 
-
-    user, exists = user_check(phone_number)
-    print(user)
-    print(exists)
+    db, cursor = ret_db_objects()
+    user_id, exists = user_check(cursor, phone_number)
     if exists is None:
-        user = create_user(phone_number)
-        print(user)
+        create_user(db, cursor, user_id, phone_number)
         msg.body("""Hello, I've detected that you're a new user. Before we begin let me give you some details on how to use me properly.
                  \nTo create a text generation response include any of these keywords: text, story or default.
                  \nTo create an image generation response include any of these keywords: image, draw or picture.
@@ -51,7 +48,7 @@ def main():
     elif 'help' in incoming_msg:
         msg.body('To create a text generation response include any of these keywords: text, story or default. \n To create an image generation response include any of these keywords: image, draw or picture.')
     if not responded:
-        msg.body('Try creating a prompt that includes these keywords \n Text creating: "generate", "create". \n Image creation: "image", "draw", "picture".')
+        msg.body('Try creating a prompt that includes these keywords \n Text creating: "text", "story", "default". \n Image creation: "image", "draw", "picture".')
     return str(resp)
 
 

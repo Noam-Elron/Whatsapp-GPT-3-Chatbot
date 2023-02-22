@@ -20,9 +20,13 @@ def db_connect():
         else:
             print(err)
 
-mydb = db_connect()
-cursor = mydb.cursor()
 
+
+def ret_db_objects():
+    db = db_connect()
+    cursor = db.cursor()
+    return db, cursor
+    
 def hash_string(data):
     hashed = hashlib.md5(data.encode(encoding="UTF-8"))
     hashed = hashed.digest()
@@ -38,7 +42,7 @@ def get_number_details(data):
     hashed_number = hash_string(phone_number)
     return hashed_number, phone_number
 
-def user_check(data):
+def user_check(cursor, phone_number):
     hashed_number, phone_number = get_number_details(data)
     query = ("SELECT uuid FROM users WHERE uuid = %s;")
     cursor.execute(query, (hashed_number,))
@@ -46,13 +50,13 @@ def user_check(data):
     cursor.close()
     return hashed_number, row
 
-def create_user(data):
-    hashed_number, phone_number = get_number_details(data)
-    query = ("INSERT INTO users (uuid, phone_number) VALUES (%s, %s);")
+def create_user(db, cursor, user_id, phone_number):
+    query = ("INSERT INTO users (uuid, phone_number, tokens) VALUES (%s, %s, 0);")
     cursor.execute(query, (hashed_number, phone_number))
-    mydb.commit()
+    db.commit()
     cursor.close()
     return hashed_number
+
 
 
 #print(user_check("whatsapp:+972542364358"))
