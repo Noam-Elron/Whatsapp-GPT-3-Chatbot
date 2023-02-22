@@ -1,18 +1,16 @@
 import mysql.connector
-from configparser import ConfigParser
 from mysql.connector import errorcode
 import hashlib
+import os
 
-config_file = ConfigParser()
-config_file.read("config.ini")
 #print(config_file["DATABASE_CREDENTIALS"]["user"])
 
 def db_setup():
     try:
         mydb = mysql.connector.connect(
-        host=config_file["DATABASE_CREDENTIALS"]["host"],
-        user=config_file["DATABASE_CREDENTIALS"]["user"],
-        password=config_file["DATABASE_CREDENTIALS"]["password"],
+        host=os.getenv("DATABASE_HOST"),
+        user=os.getenv("DATABASE_USERNAME"),
+        password=os.getenv("DATABASE_PASSWORD"),
         database= "NoamElron$users" )
         return mydb
     except mysql.connector.Error as err:

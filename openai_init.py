@@ -1,14 +1,9 @@
 import openai
-from configparser import ConfigParser
 import os
 
 print(os.getcwd())
-config_file = ConfigParser()
-config_file.read("config.ini")
-print(config_file["OPENAI"]["key"])
-print(type(config_file["OPENAI"]["key"]))
-print(config_file.sections())
-openai.api_key = config_file["OPENAI"]["key"]
+
+openai.api_key = os.getenv("OPENAI_KEY")
 
 def generate_prompt(text, max_tokens):
     text = openai.Completion.create(
