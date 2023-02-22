@@ -3,9 +3,8 @@ from mysql.connector import errorcode
 import hashlib
 import os
 
-#print(config_file["DATABASE_CREDENTIALS"]["user"])
 
-def db_setup():
+def db_connect():
     try:
         mydb = mysql.connector.connect(
         host=os.getenv("DATABASE_HOST"),
@@ -21,7 +20,8 @@ def db_setup():
         else:
             print(err)
 
-
+mydb = db_connect()
+cursor = mydb.cursor()
 
 def hash_string(data):
     hashed = hashlib.md5(data.encode(encoding="UTF-8"))
@@ -39,9 +39,6 @@ def get_number_details(data):
     return hashed_number, phone_number
 
 def user_check(data):
-    mydb = db_setup()
-    print(mydb)
-    cursor = mydb.cursor()
     hashed_number, phone_number = get_number_details(data)
     query = ("SELECT uuid FROM users WHERE uuid = %s;")
     cursor.execute(query, (hashed_number,))
@@ -50,8 +47,6 @@ def user_check(data):
     return hashed_number, row
 
 def create_user(data):
-    mydb = db_setup()
-    cursor = mydb.cursor()
     hashed_number, phone_number = get_number_details(data)
     query = ("INSERT INTO users (uuid, phone_number) VALUES (%s, %s);")
     cursor.execute(query, (hashed_number, phone_number))

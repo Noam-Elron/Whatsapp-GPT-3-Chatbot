@@ -16,18 +16,12 @@ def link():
 @app.route('/whatsapp', methods=['POST'])
 def main():
     incoming_msg = request.values.get('Body', '').lower()
-    #print("DEBUG")
-    #print(request.values)
-    #print()
-    #print(request.form)
     phone_number = request.form.get("From")
 
     resp = MessagingResponse()
     msg = resp.message()
     responded = False
 
-    #print(incoming_msg)
-    #print(type(incoming_msg))
 
     user, exists = user_check(phone_number)
     print(user)
