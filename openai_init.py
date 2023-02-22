@@ -1,8 +1,6 @@
 import openai
 import os
 
-print(os.getcwd())
-
 openai.api_key = os.getenv("OPENAI_KEY")
 
 def generate_prompt(text, max_tokens):
@@ -21,4 +19,5 @@ def generate_image(input, num_images=1):
     n=num_images,
     #The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024.
     size="512x512" )
-    return images["data"]
+    return images["data"][0]["url"]
+
