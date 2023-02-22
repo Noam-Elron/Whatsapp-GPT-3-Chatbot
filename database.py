@@ -20,7 +20,21 @@ def db_connect():
         else:
             print(err)
 
+class User:
+    def __init__(self, full_number_request):
+        self.id, self.phone_number = get_number_details(full_number_request)
 
+    def user_check(self, cursor, phone_number):
+        query = ("SELECT uuid FROM users WHERE uuid = %s;")
+        cursor.execute(query, (self.id,))
+        row = cursor.fetchone()
+        return row
+
+    def create_user(self, db, cursor):
+        query = ("INSERT INTO users (uuid, phone_number, tokens) VALUES (%s, %s, 0);")
+        cursor.execute(query, (self.id, self.phone_number))
+        db.commit()
+        
 
 def ret_db_objects():
     db = db_connect()
@@ -42,20 +56,8 @@ def get_number_details(data):
     hashed_number = hash_string(phone_number)
     return hashed_number, phone_number
 
-def user_check(cursor, phone_number):
-    hashed_number, phone_number = get_number_details(data)
-    query = ("SELECT uuid FROM users WHERE uuid = %s;")
-    cursor.execute(query, (hashed_number,))
-    row = cursor.fetchone()
-    cursor.close()
-    return hashed_number, row
 
-def create_user(db, cursor, user_id, phone_number):
-    query = ("INSERT INTO users (uuid, phone_number, tokens) VALUES (%s, %s, 0);")
-    cursor.execute(query, (hashed_number, phone_number))
-    db.commit()
-    cursor.close()
-    return hashed_number
+
 
 
 
