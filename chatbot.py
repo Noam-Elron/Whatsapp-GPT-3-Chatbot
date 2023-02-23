@@ -38,12 +38,15 @@ def main():
         image_keywords = ['image', 'draw', 'picture']
         chatbot_text = True if len(list(filter(lambda word: True if word in text_keywords else False, incoming_msg.split()))) >= 1 else False
         chatbot_img = True if len(list(filter(lambda word: True if word in image_keywords else False, incoming_msg.split()))) >= 1 else False
+        # Note to self, try to refactor this as msg.body comes up multiple times. Current issue is that image uses msg.image and then it'll send a url(before/after the image) if i try to add msg.body after the if statements.
         if chatbot_text:
-            response = msg.body(generate_prompt(incoming_msg, 50))
+            response = generate_prompt(incoming_msg, 50)
+            msg.body(response)
             db.insert_response(response)
             responded = True
         elif chatbot_img:
-            response = msg.media(generate_image(incoming_msg, 1))
+            response = generate_image(incoming_msg, 1)
+            msg.media(response)
             db.insert_response(response)
             responded = True
         elif 'help' in incoming_msg:
