@@ -34,26 +34,30 @@ def main():
         return str(resp)
 
     else:
+        image_resp = False
         text_keywords = ['text', 'story', 'default']
         image_keywords = ['image', 'draw', 'picture']
         chatbot_text = True if len(list(filter(lambda word: True if word in text_keywords else False, incoming_msg.split()))) >= 1 else False
         chatbot_img = True if len(list(filter(lambda word: True if word in image_keywords else False, incoming_msg.split()))) >= 1 else False
-        # Note to self, try to refactor this as msg.body comes up multiple times. Current issue is that image uses msg.image and then it'll send a url(before/after the image) if i try to add msg.body after the if statements.
         if chatbot_text:
             response = generate_prompt(incoming_msg, 50)
             msg.body(response)
-            db.insert_response(response)
             responded = True
         elif chatbot_img:
             response = generate_image(incoming_msg, 1)
             msg.media(response)
-            db.insert_response(response)
+            image_resp = True
             responded = True
         elif 'help' in incoming_msg:
-            msg.body('To create a text generation response include any of these keywords: text, story or default. \n To create an image generation response include any of these keywords: image, draw or picture.')
+            response = 'To create a text generation response include any of these keywords: text, story or default. \n To create an image generation response include any of these keywords: image, draw or picture.'
+            msg.body()
         if not responded:
-            msg.body('Try creating a prompt that includes these keywords \n Text creating: "text", "story", "default". \n Image creation: "image", "draw", "picture".')
+            response = 'Try creating a prompt that includes these keywords \n Text creating: "text", "story", "default". \n Image creation: "image", "draw", "picture".'
+        
+        if image_resp != True:
+            msg.body(response)
         db.insert_message(user_id, incoming_msg)
+        db.insert_response(response)
         db.close()
         return str(resp)
 
