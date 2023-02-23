@@ -1,13 +1,11 @@
 from flask import Flask, request, render_template
 from twilio.twiml.messaging_response import MessagingResponse
 from openai_init import generate_prompt, generate_image
-from database import ret_db_objects, user_check, create_user
+from database import Database
+from utils import get_number_details
+
 
 app = Flask(__name__)
-
-#ImmutableMultiDict([('SmsMessageSid', 'SMc3a61a47bc93386f52568bfc243c1ea8'), ('NumMedia', '0'), ('ProfileName', 'Noam Elron'), ('SmsSid', 'SMc3a61a47bc93386f52568bfc243c1ea8'),
-# ('WaId', '972542364358'), ('SmsStatus', 'received'), ('Body', 'Generate a story about a dog'), ('To', 'whatsapp:+14155238886'), ('NumSegments', '1'), \
-# ('ReferralNumMedia', '0'), ('MessageSid', 'SMc3a61a47bc93386f52568bfc243c1ea8'), ('AccountSid', 'AC6d3755e80d1cdaa15199754fe0b68166'), ('From', 'whatsapp:+972542364358'), ('ApiVersion', '2010-04-01')])
 
 @app.route('/', methods=['GET'])
 def link():
@@ -16,16 +14,17 @@ def link():
 @app.route('/whatsapp', methods=['POST'])
 def main():
     incoming_msg = request.values.get('Body', '').lower()
-    phone_number = request.form.get("From")
+    phone_number_extended = request.form.get("From")
 
     resp = MessagingResponse()
     msg = resp.message()
     responded = False
-
-    db, cursor = ret_db_objects()
-    user_id, exists = user_check(cursor, phone_number)
-    if exists is None:
-        create_user(db, cursor, user_id, phone_number)
+    
+    user_id, phone_number = get_number_details(phone_number_extended)
+    db = Database()
+    user_exists: bool = db.check_user(user_id)
+    if user_exists is None:
+        db.create_user(user_id, phone_number)
         msg.body("""Hello, I've detected that you're a new user. Before we begin let me give you some details on how to use me properly.
                  \nTo create a text generation response include any of these keywords: text, story or default.
                  \nTo create an image generation response include any of these keywords: image, draw or picture.
