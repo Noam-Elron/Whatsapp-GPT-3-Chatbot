@@ -47,12 +47,12 @@ class Database:
     def create_user(self, user_id, phone_number):
         query = ("INSERT INTO users (uuid, phone_number, tokens) VALUES (%s, %s, 0);")
         self._cursor.execute(query, (user_id, phone_number))
-        self.db.commit()
+        self._db_object.commit()
     
     def insert_message(self, user_id, message):
         query = ("INSERT INTO messages (uuid, message, timestamp) VALUES (%s, %s, %s);")
         self._cursor.execute(query, (user_id, message, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-        self.db.commit()
+        self._db_object.commit()
 
     def close(self):
         # Small helper function, kinda pointless but makes it so the interaction is just with the DB object and not with any of its variables.
