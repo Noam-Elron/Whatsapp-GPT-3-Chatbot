@@ -38,7 +38,7 @@ class Database:
             else:
                 raise err
 
-    def user_check(self, user_id):
+    def check_user(self, user_id):
         query = ("SELECT uuid FROM users WHERE uuid = %s;")
         self._cursor.execute(query, (user_id,))
         row = self._cursor.fetchone()
