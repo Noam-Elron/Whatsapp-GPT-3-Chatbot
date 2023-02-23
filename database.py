@@ -1,7 +1,7 @@
 import mysql.connector
 from mysql.connector import errorcode
 import os
-
+import datetime
 class Database:
     def __init__(self):
         # Making the db object and the cursor private just as its good habit to not let them be "exposed" outside of the object(even though not really private and the fact that only i have access to this codebase) 
@@ -49,6 +49,11 @@ class Database:
         self._cursor.execute(query, (user_id, phone_number))
         self.db.commit()
     
+    def insert_message(self, user_id, message):
+        query = ("INSERT INTO messages (uuid, message, timestamp) VALUES (%s, %s, %s);")
+        self._cursor.execute(query, (user_id, message, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        self.db.commit()
+
     def close(self):
         # Small helper function, kinda pointless but makes it so the interaction is just with the DB object and not with any of its variables.
         self._cursor.close()

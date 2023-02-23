@@ -33,22 +33,24 @@ def main():
         responded = True
         return str(resp)
 
-
-    text_keywords = ['text', 'story', 'default']
-    image_keywords = ['image', 'draw', 'picture']
-    chatbot_text = True if len(list(filter(lambda word: True if word in text_keywords else False, incoming_msg.split()))) >= 1 else False
-    chatbot_img = True if len(list(filter(lambda word: True if word in image_keywords else False, incoming_msg.split()))) >= 1 else False
-    if chatbot_text:
-        msg.body(generate_prompt(incoming_msg, 50))
-        responded = True
-    elif chatbot_img:
-        msg.media(generate_image(incoming_msg, 1))
-        responded = True
-    elif 'help' in incoming_msg:
-        msg.body('To create a text generation response include any of these keywords: text, story or default. \n To create an image generation response include any of these keywords: image, draw or picture.')
-    if not responded:
-        msg.body('Try creating a prompt that includes these keywords \n Text creating: "text", "story", "default". \n Image creation: "image", "draw", "picture".')
-    return str(resp)
+    else:
+        text_keywords = ['text', 'story', 'default']
+        image_keywords = ['image', 'draw', 'picture']
+        chatbot_text = True if len(list(filter(lambda word: True if word in text_keywords else False, incoming_msg.split()))) >= 1 else False
+        chatbot_img = True if len(list(filter(lambda word: True if word in image_keywords else False, incoming_msg.split()))) >= 1 else False
+        if chatbot_text:
+            msg.body(generate_prompt(incoming_msg, 50))
+            responded = True
+        elif chatbot_img:
+            msg.media(generate_image(incoming_msg, 1))
+            responded = True
+        elif 'help' in incoming_msg:
+            msg.body('To create a text generation response include any of these keywords: text, story or default. \n To create an image generation response include any of these keywords: image, draw or picture.')
+        if not responded:
+            msg.body('Try creating a prompt that includes these keywords \n Text creating: "text", "story", "default". \n Image creation: "image", "draw", "picture".')
+        db.insert_message(user_id, incoming_msg)
+        db.close()
+        return str(resp)
 
 
 
