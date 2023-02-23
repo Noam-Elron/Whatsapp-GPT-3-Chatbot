@@ -8,7 +8,7 @@ class Database:
         self._db_object = self.db_connect()
         self._cursor = self._db_object.cursor()
     
-    def db_connect():
+    def db_connect(self):
         """
         Connects to the database NoamElron$users using environmental variables for credentials.
 
