@@ -53,8 +53,12 @@ class Database:
         query = ("INSERT INTO messages (uuid, message, timestamp) VALUES (%s, %s, %s);")
         self._cursor.execute(query, (user_id, message, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         self._db_object.commit()
+    
+    def insert_response(self, response):
+        query = ("INSERT INTO responses (id, response) VALUES (SELECT MAX(id) FROM messages, %s);")
+        self._cursor.execute(query, (response,))
+        self._db_object.commit()
 
     def close(self):
         # Small helper function, kinda pointless but makes it so the interaction is just with the DB object and not with any of its variables.
         self._cursor.close()
-

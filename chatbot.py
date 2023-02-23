@@ -39,10 +39,12 @@ def main():
         chatbot_text = True if len(list(filter(lambda word: True if word in text_keywords else False, incoming_msg.split()))) >= 1 else False
         chatbot_img = True if len(list(filter(lambda word: True if word in image_keywords else False, incoming_msg.split()))) >= 1 else False
         if chatbot_text:
-            msg.body(generate_prompt(incoming_msg, 50))
+            response = msg.body(generate_prompt(incoming_msg, 50))
+            db.insert_response(response)
             responded = True
         elif chatbot_img:
-            msg.media(generate_image(incoming_msg, 1))
+            response = msg.media(generate_image(incoming_msg, 1))
+            db.insert_response(response)
             responded = True
         elif 'help' in incoming_msg:
             msg.body('To create a text generation response include any of these keywords: text, story or default. \n To create an image generation response include any of these keywords: image, draw or picture.')
@@ -51,7 +53,6 @@ def main():
         db.insert_message(user_id, incoming_msg)
         db.close()
         return str(resp)
-
 
 
 
