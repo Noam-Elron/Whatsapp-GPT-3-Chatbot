@@ -1,4 +1,5 @@
 import hashlib
+import datetime
 
 def get_number_details(data):
     # User phone number is stored in the webhooks "From" ImmutableMultiDict Key, Value pair. Returned data VALUE is in the format 'whatsapp:+972542364358' as such we'll get the phone number by splitting upon the colon. ( + still remains)
@@ -10,9 +11,11 @@ def get_number_details(data):
     hashed_number = hash_string(phone_number)
     return hashed_number, phone_number
 
-
-
 def hash_string(data):
     hashed = hashlib.md5(data.encode(encoding="UTF-8"))
     hashed = hashed.digest()
     return hashed
+
+def within_timelimit(timestamp: datetime.datetime, hours=0, seconds = 0, microseconds = 0) -> bool:
+    return timestamp < datetime.timedelta(hours = hours, seconds= seconds, microseconds=microseconds)
+

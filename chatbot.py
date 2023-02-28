@@ -41,7 +41,6 @@ def main():
         chatbot_img = True if len(list(filter(lambda word: True if word in image_keywords else False, incoming_msg.split()))) >= 1 else False
         if chatbot_text:
             response = generate_prompt(incoming_msg, 50)
-            msg.body(response)
             responded = True
         elif chatbot_img:
             response = generate_image(incoming_msg, 1)
@@ -50,12 +49,12 @@ def main():
             responded = True
         elif 'help' in incoming_msg:
             response = 'To create a text generation response include any of these keywords: text, story or default. \n To create an image generation response include any of these keywords: image, draw or picture.'
-            msg.body()
         if not responded:
             response = 'Try creating a prompt that includes these keywords \n Text creating: "text", "story", "default". \n Image creation: "image", "draw", "picture".'
         
         if image_resp != True:
             msg.body(response)
+
         db.insert_message(user_id, incoming_msg)
         db.insert_response(response)
         db.close()

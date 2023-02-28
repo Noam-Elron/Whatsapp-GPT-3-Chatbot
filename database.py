@@ -59,6 +59,18 @@ class Database:
         self._cursor.execute(query, (response,))
         self._db_object.commit()
 
+    def check_previous_message(self, user_id):
+        query = ("SELECT message, timestamp FROM messages ORDER BY timestamp DESC LIMIT 1;")
+        self._cursor.execute(query)
+        row = self._cursor.fetchone()
+        success = True
+        try:
+            assert row is not None
+            message, timestamp = row
+        except AssertionError:
+            success = False
+        return success, message, timestamp
+
     def close(self):
         # Small helper function, kinda pointless but makes it so the interaction is just with the DB object and not with any of its variables.
         self._cursor.close()
