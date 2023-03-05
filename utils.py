@@ -17,5 +17,13 @@ def hash_string(data):
     return hashed
 
 def within_timelimit(timestamp: datetime.datetime, hours=0, seconds = 0, microseconds = 0) -> bool:
-    return timestamp < datetime.timedelta(hours = hours, seconds= seconds, microseconds=microseconds)
+    if not isinstance(timestamp, datetime.datetime):
+        timestamp = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+    return (datetime.datetime.now() - timestamp) < datetime.timedelta(hours = hours, seconds= seconds, microseconds=microseconds)
 
+def word_in_message(lst1: list, lst2: list):
+    for word in lst2:
+        for match in lst1:
+            if word == match:
+                return True
+    return False
