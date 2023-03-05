@@ -3,12 +3,14 @@ from mysql.connector import errorcode
 import os
 import datetime
 class Database:
+
     def __init__(self):
-        # Making the db object and the cursor private just as its good habit to not let them be "exposed" outside of the object(even though not really private and the fact that only i have access to this codebase) 
+        # Making the db object and the cursor private just as its good habit to not let them be "exposed" outside of the object(even though not really private and the fact that only i have access to this codebase). These are instance variables as they need class methods in order to be instantiated
         self._db_object = self.db_connect()
         self._cursor = self._db_object.cursor()
-    
-    def db_connect(self):
+        
+    @staticmethod
+    def db_connect():
         """
         Connects to the database NoamElron$users using environmental variables for credentials.
 
@@ -38,40 +40,27 @@ class Database:
             else:
                 raise err
 
-    def check_user(self, user_id):
-        query = ("SELECT uuid FROM users WHERE uuid = %s;")
-        self._cursor.execute(query, (user_id,))
+    def fetch_single_row(self, query, *args):
+        if len(args) >= 1:
+            self._cursor.execute(query, (args,))
+        else:
+            self._cursor.execute(query)
+
         row = self._cursor.fetchone()
         return row
+    
+    def record_exists(self, user_id, table:str):
+        query = ("SELECT EXISTS (SELECT * FROM %s WHERE uuid=%s LIMIT 1")
+        res = self.fetch_data(query, user_id, table)
+        return True if int(res) == 1 else False
 
-    def create_user(self, user_id, phone_number):
-        query = ("INSERT INTO users (uuid, phone_number, tokens) VALUES (%s, %s, 0);")
-        self._cursor.execute(query, (user_id, phone_number))
+    def insert_data(self, query, *args):
+        self._cursor.execute(query, (*args,))
         self._db_object.commit()
     
-    def insert_message(self, user_id, message):
-        query = ("INSERT INTO messages (uuid, message, timestamp) VALUES (%s, %s, %s);")
-        self._cursor.execute(query, (user_id, message, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-        self._db_object.commit()
-    
-    def insert_response(self, response):
-        query = ("INSERT INTO responses (id, response) VALUES ((SELECT MAX(id) FROM messages), %s);")
-        self._cursor.execute(query, (response,))
-        self._db_object.commit()
-
-    def check_previous_message(self, user_id):
-        query = ("SELECT message, timestamp FROM messages ORDER BY timestamp DESC LIMIT 1;")
-        self._cursor.execute(query)
-        row = self._cursor.fetchone()
-        success = True
-        try:
-            assert row is not None
-            message, timestamp = row
-        except AssertionError:
-            success = False
-        return success, message, timestamp
-
     def close(self):
         # Small helper function, kinda pointless but makes it so the interaction is just with the DB object and not with any of its variables.
         self._cursor.close()
+
+
 
