@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-from chatbot import chatbot_flow
+from chatbot import chatbot_api
 
 
 app = Flask(__name__)
@@ -10,8 +10,8 @@ def link():
 
 @app.route('/whatsapp', methods=['POST'])
 def chatbot():
-    chatbot_flow(request)
-
+    req = chatbot_api(request)
+    return(req)
 
 
 

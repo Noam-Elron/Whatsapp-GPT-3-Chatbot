@@ -1,3 +1,5 @@
 config_maker.py
 test.py
 sql_quick_access_commands.txt
+temp_db.py
+temp_chatbot.py
